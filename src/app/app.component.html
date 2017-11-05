@@ -1,20 +1,367 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{title}}!
-  </h1>
-  <img width="300" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<section class="hero is-medium is-primary is-bold">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        Don Asteros School for the gifted
+      </h1>
+      <h2 class="subtitle">
+        Student Information System
+      </h2>
+    </div>
+  </div>
+</section>
 
+<div class="container">
+
+<div class="level">
+  <a *ngIf="loading" class="button level-item  has-text-centered is-white is-loading">Loading</a>
+</div>
+<div class="level">
+  <a class="button is-link" (click)="openModal()">Add Student</a>
+</div>
+
+<div class="columns is-mobile">
+  <div class="column is-half">
+    <nav class="panel">
+      <p class="panel-heading">
+        GRADE 5 Students
+      </p>
+      <a *ngFor="let student of students; let ind=index" class="panel-block" (click)="selectStudent(student, ind)">
+        <span class="panel-icon">
+          <i class="fa fa-book"></i>
+        </span>
+        {{student.fname}} {{student.lname}}
+      </a>
+    </nav>
+  </div>
+  <div class="column is-half">
+    <article *ngIf="!selectedStudent._id" class="message is-info">
+      <div class="message-header">
+        <p>Info</p>
+        <button class="delete" aria-label="delete"></button>
+      </div>
+      <div class="message-body">
+        Select a Student to see details.
+      </div>
+    </article>
+
+    <div *ngIf="selectedStudent._id">
+      <table class="table">
+        <!-- <thead>
+          <tr>
+            <th><abbr title="Position">Pos</abbr></th>
+            <th>Team</th>
+          </tr>
+        </thead> -->
+        <tbody>
+          <tr>
+            <th>First Name</th>
+            <td>{{selectedStudent.fname}}</td>
+          </tr>
+          <tr>
+            <th>Middle Name</th>
+            <td>{{selectedStudent.mname}}</td>
+          </tr>
+          <tr>
+            <th>Last Name</th>
+            <td>{{selectedStudent.lname}}</td>
+          </tr>
+          <tr>
+            <th>Gender</th>
+            <td>{{selectedStudent.gender}}</td>
+          </tr>
+          <tr>
+            <th>DOB</th>
+            <td>{{selectedStudent.dob | date}}</td>
+          </tr>
+          <tr>
+            <th>Admission Date</th>
+            <td>{{selectedStudent.admission_date | date}}</td>
+          </tr>
+           <tr>
+            <td><a class="button is-danger" (click)="deleteModal()">Delete</a></td>
+            <td><a class="button is-link" (click)="editModal()">Edit</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+
+<div [class]=" modal ? 'modal is-active' : 'modal'">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Add New Student</p>
+      <button class="delete" (click)="openModal()" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+
+      <div class="level">
+        <a *ngIf="modalLoading" class="button level-item  has-text-centered is-white is-loading">Loading</a>
+      </div>
+      
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Title</label>
+        </div>
+        <div class="field-body">
+          <div class="field is-narrow">
+            <div class="control">
+              <div class="select is-fullwidth">
+                <select [(ngModel)]="newStudent.title">
+                  <option></option>
+                  <option>Mr.</option>
+                  <option>Ms.</option>
+                  <option>Miss.</option>
+                  <option>Mrs.</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">First Name</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input [(ngModel)]="newStudent.fname" class="input is-info" type="text" placeholder="First Name">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Middle Name</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input [(ngModel)]="newStudent.mname" class="input is-info" type="text" placeholder="Middle Name">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Last Name</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input [(ngModel)]="newStudent.lname" class="input is-info" type="text" placeholder="Last Name">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Date of Birth</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input [ngModel] ="newStudent.dob | date:'yyyy-MM-dd'" (ngModelChange)="newStudent.dob = $event" class="input is-info">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label">
+          <label class="label">Gender</label>
+        </div>
+        <div class="field-body">
+          <div class="field is-narrow">
+            <div class="control">
+              <label class="radio">
+                <input type="radio" [(ngModel)]="newStudent.gender" value="male" name="gender">
+                Male
+              </label>
+              <label class="radio">
+                <input type="radio" [(ngModel)]="newStudent.gender" value="female" name="gender">
+                Female
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Admission Date</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+               <input [ngModel] ="newStudent.admission_date | date:'yyyy-MM-dd'" (ngModelChange)="newStudent.admission_date = $event" class="input is-info"> 
+              <!-- <input #myDate [value]="newStudent.admission_date | date:'MM-dd-yyyy'" (input)="newStudent.admission_date=parseDate($event.target.valueAsDate)" class="input is-info" /> -->
+            </div>
+          </div>
+        </div>
+      </div>      
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-success" (click)="saveStudent()">Add</button>
+      <button class="button" (click)="openModal()">Cancel</button>
+    </footer>
+  </div>
+</div>
+
+ <div [class]=" editmodal ? 'modal is-active' : 'modal'">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Update details of {{selectedStudent.fname}} {{selectedStudent.lname}}</p>
+      <button class="delete" (click)="editModal()" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+
+      <div class="level">
+        <a *ngIf="modalLoading" class="button level-item  has-text-centered is-white is-loading">Loading</a>
+      </div>
+      
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Title</label>
+        </div>
+        <div class="field-body">
+          <div class="field is-narrow">
+            <div class="control">
+              <div class="select is-fullwidth">
+                <select [(ngModel)]="editStudent.title">
+                  <option></option>
+                  <option>Mr.</option>
+                  <option>Ms.</option>
+                  <option>Miss.</option>
+                  <option>Mrs.</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">First Name</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input [(ngModel)]="editStudent.fname" class="input is-info" type="text" placeholder="First Name">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Middle Name</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input [(ngModel)]="editStudent.mname" class="input is-info" type="text" placeholder="Middle Name">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Last Name</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input [(ngModel)]="editStudent.lname" class="input is-info" type="text" placeholder="Last Name">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Date of Birth</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <input [ngModel] ="editStudent.dob | date:'yyyy-MM-dd'" (ngModelChange)="editStudent.dob = $event" class="input is-info">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label">
+          <label class="label">Gender</label>
+        </div>
+        <div class="field-body">
+          <div class="field is-narrow">
+            <div class="control">
+              <label class="radio">
+                <input type="radio" [(ngModel)]="editStudent.gender" value="male" name="gender1">
+                Male
+              </label>
+              <label class="radio">
+                <input type="radio" [(ngModel)]="editStudent.gender" value="female" name="gender1">
+                Female
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label is-normal">
+          <label class="label">Admission Date</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+               <input [ngModel] ="editStudent.admission_date | date:'yyyy-MM-dd'" (ngModelChange)="editStudent.admission_date = $event" class="input is-info"> 
+              
+            </div>
+          </div>
+        </div>
+      </div>      
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-info" (click)="updateStudent()">Update Student</button>
+      <button class="button" (click)="editModal()">Cancel</button>
+    </footer>
+  </div>
+</div>   
+
+<div [class]=" deletemodal ? 'modal is-active' : 'modal'">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Delete Student</p>
+      <button class="delete" (click)="deleteModal()" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="level">
+        <a *ngIf="modalLoading" class="button level-item  has-text-centered is-white is-loading">Loading</a>
+      </div>
+        Are you sure you want to delete {{selectedStudent.fname}} {{selectedStudent.lname}} ?
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-danger" (click)="deleteStudent()">Delete</button>
+      <button class="button" (click)="deleteModal()">Cancel</button>
+    </footer>
+  </div>
+</div>
+
+</div>
